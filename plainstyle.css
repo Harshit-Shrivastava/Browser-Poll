@@ -1,0 +1,25 @@
+#dleft
+{
+	position:absolute;
+	left:30%;
+	left-margin:20%;
+	color:#525252;
+	font-family:"Trebuchet MS", Helvetica, sans-serif;
+	font-family:"Trebuchet MS", Helvetica, sans-serif;
+	top:300px;
+	max-height:100px;
+	z-index:1;
+}
+
+#dright 
+{
+	position:absolute;
+	left:50%;
+	left-margin:50%;
+	color:#525252;
+	font-family:"Trebuchet MS", Helvetica, sans-serif;
+	font-family:"Trebuchet MS", Helvetica, sans-serif;
+	top:300px;
+	max-height:90px;
+	z-index:0;
+}
