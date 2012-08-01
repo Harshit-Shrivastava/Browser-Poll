@@ -1,117 +1,85 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
 
-<html>
-<head>
-<title>Browser Poll</title>
-</head>
+//Retrieving data from the form
+//No need to save any data in session variables because we dont need to access it in some other page
+//Use of GET method can be considered safe here.
+//Use of POST not required as there are no sensitive fields viz. password etc here
 
-<script type="text/javascript">
-  //function for including the Google+ like button
-  (function() {
-    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-    po.src = 'https://apis.google.com/js/plusone.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  })();
-</script>
-<!--For including the external CSS files-->
-<link rel="stylesheet" type="text/css" href="plainstyle.css" />
-<link rel="stylesheet" type="text/css" href="stylesheet.css" />
+if (isset($_GET['submit'])) {
+    $name = $_GET['uname'];
+    $email = $_GET['email'];
+    $browser = $_GET['browser'];
+    $reason = $_GET['area'];
+    $date = date('Y-m-d');
+    $maildata = 'Your feedback has been recorded. Your choice was' . $browser . 'and reason was' . $reason . '';
+//Creating the string for sending the mail
 
-<script type="text/javascript" language="javascript">
-//method for validation of form
-function validateForm()
-{
-	//validation of name text-field
-	var x=document.forms["form1"]["uname"].value;
-	if (x==null || x=="")
-	{
-		alert("Please enter name");
-		return false;
-	}
-	
-	//validation of reason text-area
-	var y=document.forms["form1"]["area"].value;
-	if (y==null || y=="")
-	{
-		alert("Please specify reason");
-		return false;
-	}
+    $found = 0; //This variable takes care of protection against repeated entries
+//Database connectivity
+    $con = mysql_connect("localhost", "root", "");
+    mysql_select_db("task", $con);
+//Query to select all tuples from the table
+    $query = "select * from entries";
+    $result = mysql_query($query, $con);
+    while ($row = mysql_fetch_array($result)) {
+        if (($row['Email'] == $email)) {
+            //Checking if the user has already given a poll before
+            $oldchoice = $row['Browser']; //Saving his previous choice
+            $found = 1; //User found as an old user
+            //Updating the user details
+            $query = "UPDATE `Task`.`entries` SET `Browser` = '$browser' 
+			WHERE `entries`.`Name` = '$name' AND `entries`.`Email` = '$email'";
+            $conn = mysqli_connect("localhost", "root", "", "task") or die("failed to connect");
+            $res = mysqli_query($conn, $query);
+
+            if (mysql_affected_rows() != 0) {
+                //Updating the browser poll details
+                $query = "UPDATE `task`.`pollresult` SET `Count` = `Count`-'1' WHERE `pollresult`.`Browser` = '$oldchoice' LIMIT 1";
+                $res = mysqli_query($conn, $query);
+                $query = "UPDATE `task`.`pollresult` SET `Count` = `Count`+'1' WHERE `pollresult`.`Browser` = '$browser' LIMIT 1";
+
+                //mail($email,"Hello",$maildata);
+                //For sending mails
+
+                $res = mysqli_query($conn, $query);
+                if (mysql_affected_rows() != 0) {
+                    //Redirecting to the results page
+                    header("Location: result.php");
+                } else {
+                    //Redirecting to error page
+                    header("Location: sorry.php");
+                }
+            } else {
+                //Redirecting to error page
+                header("Location: sorry.php");
+            }
+        }
+    }
+
+
+    if ($found == 0) {//New User
+        $conn = mysqli_connect("localhost", "root", "", "task") or die("failed to connect");
+        $query = "INSERT INTO `Task`.`entries` (`Name`, `Email`, `Browser`, `Reason`, `Date`) VALUES 
+	('$name', '$email', '$browser', '$reason', '$date')";
+        $res = mysqli_query($conn, $query);
+
+        if (mysql_affected_rows() != 0) {
+            $query = "UPDATE `task`.`pollresult` SET `Count` = `Count`+'1' WHERE `pollresult`.`Browser` = '$browser' LIMIT 1";
+            //mail($email,"Hello",$maildata);
+
+            $res = mysqli_query($conn, $query);
+            if (mysql_affected_rows() != 0) {
+                //Redirecting to the results page
+                header("Location: result.php");
+            } else {
+                //Redirecting to error page
+                header("Location: sorry.php");
+            }
+        } else {
+            //Redirecting to error page
+            header("Location: sorry.php");
+        }
+    }
 }
-
-</script>
-
-<body>
-
-
-<div id="topshade"></div>
-<div id="glike">
-<!--Placing the Google+ like button-->
-<g:plusone annotation="inline"></g:plusone>
-</div>
-<div id="top"><img src="top.jpg" width="100%" height="150px"></div>
-<div id="heading"><center><font size="400%">Browser Poll</font></center>
-</div>
-<p class="ex" align="justify">
-
-<div id="login">
-
-<!--The form starts from here-->
-<form name="form1" method="get" action="redirect.php" onsubmit="return validateForm()">
-
-<div id="dleft">
-<center><font color="#D13E19">Please enter the details for browser poll</font></center><br />
-<br/><br/>Name : 
-
-<br/><br/>E-mail : 
-
-<br/><br/>Browser Choice :
-
-<br/><br/><br/><br/><br/><br/><br/><br/><br/>Reason: 
-<br/><br/><br/><br/><br/><br/><center>
-&nbsp;&nbsp;&nbsp;
-<input type="submit" value="Submit">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<input type="reset" value="Clear">
-</center>
-</div>
-
-<div id="dright"> 
-<br/>
-<br/><br/><br/>
-<input type="text" name="uname" size="32" placeholder="Name">
-
-<br/><br/>
-<!--HTML 5 supports email text field and also performs validation over this textfield,
-so no separate JavaScript validation required for this-->
-<input type="email" name="email" size="32" placeholder="me@example.com"/>
-<br/><br/>
-<input type="radio" name="browser" value="Internet Explorer">Internet Explorer<br/>
-<input type="radio" name="browser" value="Firefox">Firefox<br/>
-<input type="radio" name="browser" value="Chrome">Chrome<br/>
-<input type="radio" name="browser" value="Safari">Safari<br/>
-<input type="radio" name="browser" value="Opera">Opera<br/>
-<input type="radio" name="browser" value="Konqueror">Konqueror<br/>
-<input type="radio" name="browser" value="Lynx">Lynx<br/>
-<br/><br/>
-<textarea name="area" rows="4" columns="25" placeholder="Please specify reason">
-</textarea><br/><br/><br/>
-
-</div>
-
-</form>
-</div>
-
-</p>
-<div id="foot">
-<br/>
-<center><br/>
-2012 (c) Harshit Shrivastava
-</br>
-</center>
-</div>
-</center>
-
-</body>
-<html>
+include ('view/v_index.php');
+?>

@@ -94,27 +94,27 @@ if($total!=0)
 	<tr>
 	<td>
 	<?php
-		echo ''.$row['Name'];
+		echo ''.htmlspecialchars($row['Name']);
 	?>
 	</td>
 	<td>
 	<?php
-	echo ''.$row['Email'];
+	echo ''.htmlspecialchars($row['Email']);
 	?>
 	</td>
 	<td>
 	<?php
-	echo ''.$row['Browser'];
+	echo ''.htmlspecialchars($row['Browser']);
 	?>
 	</td>
 	<td>
 	<?php
-	echo ''.$row['Reason'];
+	echo ''.htmlspecialchars($row['Reason']);
 	?>
 	</td>
 	<td>
 	<?php
-	echo ''.$row['Date'];
+	echo ''.htmlspecialchars($row['Date']);
 	?>
 	</td>
 	</tr>
