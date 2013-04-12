@@ -21,8 +21,8 @@ $maildata = 'Your feedback has been recorded. Your choice was' . $browser . 'and
 $found = 0; //This variable takes care of protection against repeated entries
 //Database connectivity
 
-$dbconnect = new dbconnect();
-$result = $dbconnect->queryAll();
+$dbobj = new dbconnect();
+$result = $dbobj->queryAll();
 while ($row = mysql_fetch_array($result)) {
     if (($row['Email'] == $email)) {
         //Checking if the user has already given a poll before
@@ -31,22 +31,23 @@ while ($row = mysql_fetch_array($result)) {
         //Updating the user details
         $query = "UPDATE `Task`.`entries` SET `Browser` = '$browser' 
 			WHERE `entries`.`Name` = '$name' AND `entries`.`Email` = '$email'";
-        $res = $dbconnect->executeQuery($query);
-        echo $query;
+        $res = $dbobj->executeQuery($query);
+        echo "<br/>".$query;
 
         if (mysql_affected_rows() != 0) {
             //Updating the browser poll details
             $query = "UPDATE `task`.`pollresult` SET `Count` = `Count`-'1' WHERE `pollresult`.`Browser` = '$oldchoice' LIMIT 1";
-            $res = $dbconnect->executeQuery($query);
+            $res = $dbobj->executeQuery($query);
             $query = "UPDATE `task`.`pollresult` SET `Count` = `Count`+'1' WHERE `pollresult`.`Browser` = '$browser' LIMIT 1";
 
             //mail($email,"Hello",$maildata);
             //For sending mails
 
-            $res = $dbconnect->executeQuery($query);
+            $res = $dbobj->executeQuery($query);
             if (mysql_affected_rows() != 0) {
                 //Redirecting to the results page
-                header("Location: result.php");
+				echo "<br/>"."S0-0";
+                //header("Location: result.php");
             } else {
                 //Redirecting to error page
                 header("Location: sorry.php");
@@ -63,16 +64,17 @@ if ($found == 0) {//New User
     
     $query = "INSERT INTO `Task`.`entries` (`Name`, `Email`, `Browser`, `Reason`, `Date`) VALUES 
 	('$name', '$email', '$browser', '$reason', '$date')";
-    $res = $dbconnect->executeQuery($query);
+    $res = $dbobj->executeQuery($query);
     
     if (mysql_affected_rows() != 0) {
         $query = "UPDATE `task`.`pollresult` SET `Count` = `Count`+'1' WHERE `pollresult`.`Browser` = '$browser' LIMIT 1";
         //mail($email,"Hello",$maildata);
 
-        $res = $dbconnect->executeQuery($query);
+        $res = $dbobj->executeQuery($query);
         if (mysql_affected_rows() != 0) {
             //Redirecting to the results page
-            header("Location: result.php");
+            echo 
+			header("Location: result.php");
         } else {
             //Redirecting to error page
             header("Location: sorry.php");
