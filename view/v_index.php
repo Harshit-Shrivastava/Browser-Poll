@@ -45,6 +45,7 @@ function validateForm()
 
 <div id="topshade"></div>
 <div id="glike">
+
 <!--Placing the Google+ like button-->
 <g:plusone annotation="inline"> </ g:plusone>
 </div>
