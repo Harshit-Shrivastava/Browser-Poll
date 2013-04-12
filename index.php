@@ -4,7 +4,7 @@
 //No need to save any data in session variables because we dont need to access it in some other page
 //Use of GET method can be considered safe here.
 //Use of POST not required as there are no sensitive fields viz. password etc here
-
+/*
 if (isset($_GET['submit'])) {
     $name = $_GET['uname'];
     $email = $_GET['email'];
@@ -80,6 +80,6 @@ if (isset($_GET['submit'])) {
             header("Location: sorry.php");
         }
     }
-}
+}*/
 include ('view/v_index.php');
 ?>
